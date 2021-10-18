@@ -1,4 +1,4 @@
-# Project Title
+# Depression Detection
 
 ## Overview
 
