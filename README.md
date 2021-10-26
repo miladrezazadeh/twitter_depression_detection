@@ -1,4 +1,4 @@
-# Depression Detection
+# Twitter Depression Detection
 
 ## Overview
 
