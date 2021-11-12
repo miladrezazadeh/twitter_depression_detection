@@ -10,7 +10,13 @@ Original file is located at
 from google.colab import drive
 drive.mount('/content/drive')
 
-!pip install -qqq lime
+!pip install -qqq h5py
+
+!pip install --upgrade -qqq gensim
+
+!python -m spacy download en_core_web_lg
+
+!pip install -U SpaCy==2.2.0
 
 ## Import required libraries
 
@@ -26,9 +32,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-## Bag of Words
-from sklearn.feature_extraction.text import CountVectorizer
-
 ## TF-IDF 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -42,11 +45,16 @@ from sklearn.model_selection import train_test_split
 ## Feature selection
 from sklearn import feature_selection
 
-## Logistic Regression
+## libraraies for classification
 from sklearn.pipeline import Pipeline
 import sklearn.metrics as skm
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 ## for saving model
 import pickle
@@ -54,7 +62,10 @@ import pickle
 ## for explainer
 #from lime import lime_text
 
-## for word embedding
+## detokenization
+from nltk.tokenize.treebank import TreebankWordDetokenizer
+
+## for word embedding with gensim
 import gensim
 import gensim.downloader as gensim_api
 from gensim.models import Word2Vec
@@ -62,13 +73,22 @@ from gensim.models import KeyedVectors
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
+## for word embedding with Spacy
+import spacy
+import en_core_web_lg
+
 ## for deep learning
+from keras.models import load_model
 from keras.models import Model, Sequential
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Conv1D, Dense, Input, LSTM, Embedding, Dropout, Activation, MaxPooling1D
 from tensorflow.keras import models, layers, preprocessing as kprocessing
 from tensorflow.keras import backend as K
-
+import tensorflow as tf
+import keras
+from keras.layers import Lambda
+import tensorflow as tf
+from keras.models import model_from_json
 
 ## for bert language model
 #import transformers
@@ -76,59 +96,7 @@ from tensorflow.keras import backend as K
 df_all = pd.read_csv("/content/drive/MyDrive/NLP/Depression_Detection/data_cleaning/processed_data/processed_data.csv",
                      sep='\t', encoding='utf-8')
 
-df_all.head()
-
-"""## Bag of Words
-
-Bag of Words will create a table with words as attributes(columns) and sentences as observations(rows).
-
-**CountVectorizer**
-
-It Convert a collection of text documents to a matrix of token counts. The value of each cell is nothing but the count of the word in that particular text sample.
-"""
-
-# Creating the Bag of Words model
-count_vect = CountVectorizer()
-X_bw = count_vect.fit_transform(df_all['clean_text'].values.astype('U')).toarray()
-X_bw
-
-"""## TF-IDF """
-
-## Adding clean tweets to a list called corpus
-corpus = []
-corpus = [x for x in df_train['clean_text']] 
-# corpus = df_train["clean_text"]
-
-"""TF-IDF (term frequency and inverse document frequency):"""
-
-## Creating the TF-IDF model
-cv = TfidfVectorizer()
-X_tfidf = cv.fit_transform(df_all['clean_text'].apply(lambda x: np.str_(x)))
-dic_vocabulary = cv.vocabulary_
-
-sns.heatmap(X_tfidf.todense()[:,np.random.randint(0,X_tfidf.shape[1],100)]==0, vmin=0, vmax=1, cbar=False).set_title('Sparse Matrix Sample')
-
-"""In order to know the position of a certain word, we can look it up in the vocabulary:"""
-
-word = "mental"
-dic_vocabulary[word]
-
-"""If the word exists in the vocabulary, this command prints a number N, meaning that the Nth feature of the matrix is that word.
-
-## Spliting data to train and test datasets from TFIDF
-"""
-
-## split dataset to train and test
-X_train, X_test, y_train, y_test = train_test_split(X_tfidf, df_all['label'], test_size=0.3, random_state= 42)
-
-X_train.shape, X_test.shape, y_train.shape, y_test.shape
-
-# # Create the visualizer and draw the vectors
-# tsne = TSNEVisualizer()
-# tsne.fit(X_tfidf, y)
-# tsne.show()
-
-# print(X_tfidf.shape)
+df_all
 
 """## Feature selection
 
@@ -143,12 +111,12 @@ In order to drop some columns and reduce the matrix dimensionality, we can carry
 This snippet of code is derived from https://towardsdatascience.com/text-classification-with-nlp-tf-idf-vs-word2vec-vs-bert-41ff868d1794
 """
 
-y = df_train["label"]
+y = y_train
 X_names = cv.get_feature_names()
 p_value_limit = 0.95
 df_features = pd.DataFrame()
 for cat in np.unique(y):
-    chi2, p = feature_selection.chi2(X_train, y==cat)
+    chi2, p = feature_selection.chi2(X_train_tfidf, y==cat)
     df_features = df_features.append(pd.DataFrame(
                    {"feature":X_names, "score":1-p, "y":cat}))
     df_features = df_features.sort_values(["y","score"], 
@@ -158,7 +126,7 @@ X_names = df_features["feature"].unique().tolist()
 
 print(len(X_names))
 
-"""I reduced the number of features from 10,000 to 688 by keeping the most statistically relevant ones. Let’s print some:"""
+"""I reduced the number of features from 20018 to 688 by keeping the most statistically relevant ones. Let’s print some:"""
 
 for cat in np.unique(y):
    print("# {}:".format(cat))
@@ -167,14 +135,184 @@ for cat in np.unique(y):
    print("  . top features:", ",".join(df_features[df_features["y"]==cat]["feature"].values[:10]))
    print(" ")
 
-"""## Visualizing patterns in feature vectors in 2D Space
+"""## Classifications and LSTM with Word2vec -pretrained model(Spacy):"""
 
-**T-SNE :** t-distributed stochastic neighbor embedding t-SNE is a machine learning algorithm for visualization based on Stochastic Neighbor Embedding. It is a nonlinear dimensionality reduction technique well-suited for embedding high-dimensional data for visualization in a low-dimensional space of two or three dimensions. Specifically, it models each high-dimensional object by a two- or three-dimensional point in such a way that similar objects are modeled by nearby points and dissimilar objects are modeled by distant points with high probability.
+nlp = en_core_web_lg.load()
 
-## Logistic Regression
+"""In order to run a supervised learning model, we first need to convert the clean_text into feature representation."""
 
-Build a scikit-learn pipeline: a sequential application of a list of transformations and a final estimator. Putting the Tf-Idf vectorizer and Logistic Regression classifier in a pipeline allows us to transform and predict test data in just one step.
+## word-embedding
+all_vectors = pd.np.array([pd.np.array([token.vector for token in nlp(s)]).mean(axis=0) * pd.np.ones((300)) \
+                           for s in df_all['clean_text']])
+
+# split out validation dataset for the end
+Y= df_all["label"]
+X = all_vectors
+
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, GridSearchCV
+validation_size = 0.3
+seed = 7
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=validation_size, random_state=seed)
+
+# test options for classification
+num_folds = 10
+seed = 7
+scoring = 'accuracy'
+
+## spot check the algorithms
+models = []
+models.append(('LR', LogisticRegression()))
+models.append(('KNN', KNeighborsClassifier()))
+models.append(('CART', DecisionTreeClassifier()))
+models.append(('SVM', SVC()))
+## Neural Network
+models.append(('NN', MLPClassifier()))
+## Ensable Models 
+models.append(('RF', RandomForestClassifier()))
+
+## Running the classification models
+results = []
+names = []
+kfold_results = []
+test_results = []
+train_results = []
+for name, model in models:
+    kfold = KFold(n_splits=num_folds, random_state=seed)
+    cv_results = cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+    results.append(cv_results)
+    names.append(name)
+    #msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+    #print(msg)
+   
+   # Full Training period
+    res = model.fit(X_train, Y_train)
+    train_result = accuracy_score(res.predict(X_train), Y_train)
+    train_results.append(train_result)
+    
+    # Test results
+    test_result = accuracy_score(res.predict(X_test), Y_test)
+    test_results.append(test_result)    
+    
+    msg = "%s: %f (%f) %f %f" % (name, cv_results.mean(), cv_results.std(), train_result, test_result)
+    print(msg)
+    print(confusion_matrix(res.predict(X_test), Y_test))
+    #print(classification_report(res.predict(X_test), Y_test))
+
+# compare algorithms
+from matplotlib import pyplot
+fig = pyplot.figure()
+ind = np.arange(len(names))  # the x locations for the groups
+width = 0.35  # the width of the bars
+fig.suptitle('Algorithm Comparison')
+ax = fig.add_subplot(111)
+pyplot.bar(ind - width/2, train_results,  width=width, label='Train Error')
+pyplot.bar(ind + width/2, test_results, width=width, label='Test Error')
+fig.set_size_inches(15,8)
+pyplot.legend()
+ax.set_xticks(ind)
+ax.set_xticklabels(names)
+pyplot.show()
+
+"""The best model with the highest accuracy is **Support Vector Machine(SVM)** with **85.79**% accuracy on test dataset. Logistic Regression performed good as well but we see overfitting problem with CART, NN and RF.
+
+### LSTM model:
 """
+
+### Create sequence
+vocabulary_size = 20000
+tokenizer = Tokenizer(num_words= vocabulary_size)
+tokenizer.fit_on_texts(df_all['clean_text'])
+sequences = tokenizer.texts_to_sequences(df_all['clean_text'])
+X_LSTM = pad_sequences(sequences, maxlen=50)
+
+## Split the data into train and test
+Y_LSTM = df_all["label"]
+X_train_LSTM, X_test_LSTM, Y_train_LSTM, Y_test_LSTM = train_test_split(X_LSTM, \
+                       Y_LSTM, test_size=validation_size, random_state=seed)
+
+from keras.wrappers.scikit_learn import KerasClassifier
+def create_model(input_length=50):
+    model = Sequential()
+    model.add(Embedding(20000, 300, input_length=50))
+    model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])    
+    return model    
+model_LSTM = KerasClassifier(build_fn=create_model, epochs=3, verbose=1, validation_split=0.4)
+model_LSTM.fit(X_train_LSTM, Y_train_LSTM)
+
+train_result_LSTM = accuracy_score(model_LSTM.predict(X_train_LSTM), Y_train_LSTM)
+# Test results
+test_result_LSTM = accuracy_score(model_LSTM.predict(X_test_LSTM), Y_test_LSTM)
+
+print("train result:", train_result_LSTM)
+print("test result:", test_result_LSTM)
+
+confusion_matrix(model_LSTM.predict(X_test_LSTM), Y_test_LSTM)
+
+train_results.append(train_result_LSTM);test_results.append(test_result_LSTM)
+
+names.append("LSTM")
+
+# compare algorithms
+from matplotlib import pyplot
+fig = pyplot.figure()
+ind = np.arange(len(names))  # the x locations for the groups
+width = 0.35  # the width of the bars
+fig.suptitle('Algorithm Comparison')
+ax = fig.add_subplot(111)
+pyplot.bar(ind - width/2, train_results,  width=width, label='Train Error')
+pyplot.bar(ind + width/2, test_results, width=width, label='Test Error')
+fig.set_size_inches(15,8)
+pyplot.legend()
+ax.set_xticks(ind)
+ax.set_xticklabels(names)
+pyplot.show()
+plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/classification_comparision.png')
+
+"""## Logistic Regression with TFIDF:
+
+### Spliting data to train and test datasets:
+"""
+
+## split dataset to train and test
+X_train, X_test, y_train, y_test = train_test_split(df_all['clean_text'], df_all['label'], test_size=0.3, random_state= 42)
+
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+"""### TF-IDF
+
+TF-IDF (term frequency and inverse document frequency):
+"""
+
+## Creating the TF-IDF model
+cv = TfidfVectorizer()
+cv.fit(X_train.to_list())
+dic_vocabulary = cv.vocabulary_
+
+X_train_tfidf = cv.transform(X_train.to_list())
+
+X_test_tfidf = cv.transform(X_test.to_list())
+
+cv.inverse_transform(X_test_tfidf[0])
+
+X_train_tfidf.shape
+
+# ## Adding clean tweets to a list called corpus
+# corpus = []
+# corpus = [x for x in df_train['clean_text']] 
+# # corpus = df_train["clean_text"]
+
+"""The feature matrix X_train_tfidf has a shape of 16,464 (Number of documents in training) x 20018 (Length of vocabulary) and it’s pretty sparse:"""
+
+sns.heatmap(X_train_tfidf.todense()[:,np.random.randint(0,X_train_tfidf.shape[1],100)]==0, vmin=0, vmax=1, cbar=False).set_title('Sparse Matrix Sample')
+
+"""In order to know the position of a certain word, we can look it up in the vocabulary:"""
+
+word = "mental"
+dic_vocabulary[word]
+
+"""Build a scikit-learn pipeline: a sequential application of a list of transformations and a final estimator. Putting the Tf-Idf vectorizer and Logistic Regression classifier in a pipeline allows us to transform and predict test data in just one step."""
 
 # classifier = LogisticRegression(solver='liblinear', penalty='l1')
 
@@ -190,7 +328,7 @@ Build a scikit-learn pipeline: a sequential application of a list of transformat
 # ## creating the instance of the models
 lr = LogisticRegression(solver='liblinear', penalty='l1')
 ## fitting the model
-print(lr.fit(X_train, y_train))
+print(lr.fit(X_train_tfidf, y_train.to_list()))
 
 ## Save the Modle to file in the current working directory
 LogisticReg = "/content/drive/MyDrive/NLP/Depression_Detection/modeling/model_LogReg.pkl"  
@@ -205,12 +343,12 @@ with open(LogisticReg, 'rb') as file:
 lr
 
 ## Test
-y_pred_lr = lr.predict(X_test)
-probs = lr.predict_proba(X_test)
-classes = np.unique(y_test)
+y_pred_lr = lr.predict(X_test_tfidf)
+probs = lr.predict_proba(X_test_tfidf)
+classes = np.unique(y_test.to_list())
 y_test_array = pd.get_dummies(y_test, drop_first=False).values
 
-"""### Evaluate the performance:
+"""## Evaluate the performance:
 
 *   **Accuracy:** the fraction of predictions the model got right.
 *   **Confusion Matrix:** a summary table that breaks down the number of correct and incorrect predictions by each class.
@@ -221,7 +359,7 @@ y_test_array = pd.get_dummies(y_test, drop_first=False).values
 
 def conf_matrix_acc(y_true, y_pred):
   ## Plot confusion matrix
-  cm = confusion_matrix(y_test, y_pred)
+  cm = confusion_matrix(y_true, y_pred)
   fig, ax = plt.subplots()
   sns.heatmap(cm, annot=True, fmt='d', ax=ax, cmap=plt.cm.Blues, 
             cbar=False)
@@ -232,9 +370,7 @@ def conf_matrix_acc(y_true, y_pred):
   print(f'Accuracy score is : {accuracy_score(y_true, y_pred)}')
   print("=========================================")
   print("Detail:")
-  print(skm.classification_report(y_test, y_pred_lr))
-
-conf_matrix_acc(y_test,y_pred_lr)
+  print(skm.classification_report(y_true, y_pred))
 
 ## Plot ROC and precision-recall curve
 def roc_precision_auc():
@@ -269,53 +405,100 @@ def roc_precision_auc():
   ax[1].grid(True)
   plt.show()
   #plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/ROC_Precision_LR.png')
-  #plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/ROC_Precision_LSTM.png')  
+  plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/ROC_Precision_SVM.png')  
   ## AUC score
-  print(f'AUC score is : {skm.roc_auc_score(y_test, probs[:,1])}')
+  print(f'AUC score is : {skm.roc_auc_score(Y_test, probs[:,1])}')
+
+conf_matrix_acc(y_test.to_list(),y_pred_lr)
 
 roc_precision_auc()
 
-type(y_test)
+"""## Support Vector Machine(SVM) with word2vec:"""
 
-# converting to list
-y_test_1 = y_test.tolist()
+nlp = en_core_web_lg.load()
 
-y_pred_lr_1 = y_pred_lr.tolist()
+## word-embedding
+all_vectors = pd.np.array([pd.np.array([token.vector for token in nlp(s)]).mean(axis=0) * pd.np.ones((300)) \
+                           for s in df_all['clean_text']])
 
-y_test_1[0:18]
+# split out validation dataset for the end
+Y= df_all["label"]
+X = all_vectors
 
-len(y_test_1)
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, GridSearchCV
+validation_size = 0.3
+seed = 7
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=validation_size, random_state=seed)
 
-y_pred_lr_1[0:18]
+# test options for classification
+num_folds = 10
+seed = 7
+scoring = 'accuracy'
 
-len(y_pred_lr_1)
+#Create a svm Classifier
+clf = SVC(probability=True)
 
-df_all.iloc[1]
+## Running the svm Classifier
+#kfold = KFold(n_splits=num_folds, random_state=seed)
+#cv_results = cross_val_score(clf, X_train, Y_train, cv=kfold, scoring=scoring)
+   
+# Full Training period
+res = clf.fit(X_train, Y_train)
+train_result = accuracy_score(res.predict(X_train), Y_train)
+test_result = accuracy_score(res.predict(X_test), Y_test)
+#msg = "SVM: %f (%f) %f %f" % (cv_results.mean(), cv_results.std(), train_result, test_result)
+#print(msg)
 
+print("train_result:", "test_resuld:", train_result, test_result, sep=" ")
+
+## Save the Modle to file in the current working directory
+SVM = "/content/drive/MyDrive/NLP/Depression_Detection/modeling/model_svm.pkl"  
+
+with open(SVM, 'wb') as file:  
+    pickle.dump(clf, file)
+
+## Load the Model back from file
+with open(SVM, 'rb') as file:  
+    clf = pickle.load(file)
+
+clf
+
+## Test results
+## 
+y_pred_svm = res.predict(X_test) 
+classes = np.unique(Y_test.to_list())
+y_test_array = pd.get_dummies(Y_test, drop_first=False).values
+probs = res.predict_proba(X_test)
+conf_matrix_acc(Y_test.to_list(),y_pred_svm)
+roc_precision_auc()
+
+"""## Exploring False positive and False negative:"""
+
+## creating lists of true values and predictions
+y_test_1 = [x for x in y_test]
+y_pred_lr_1 = [x for x in y_pred_lr]
+
+## Find the indices of wrong predictions
 idx = [] 
 for i in range(len(y_test_1)):
   if y_test_1[i] != y_pred_lr_1[i]:
     idx.append(i)
     i+=1
 
-idx[0:10]
+print('There are", {} "wrong preditions", len(idx))
 
-print(X_test)
+wrong_arr = cv.inverse_transform(X_test_tfidf[idx])
 
-#fpr, tpr, _ = skm.roc_curve(y_test, probs[:,1])
+## detokenize the wrong array
+detokenized = [TreebankWordDetokenizer().detokenize(x) for x in wrong_arr]
 
-# ## ROC curve
-# plt.xlabel("False Positive Rate")
-# plt.ylabel("True Positive Rate")
-# plt.title("Receiver operating characteristic example")
-# plt.plot(fpr, tpr, 'go-')
+detokenized[:50]
 
-"""## Word2vec with gensim"""
+"""There is no specific patterns between false positive and false negative predictions.
 
-!pip install --upgrade -qqq gensim
+## Bidirectional LSTM with Word2vec-gensim:
 
-"""In Python, you can load a pre-trained Word Embedding model from genism-data like this:
-
+In Python, you can load a pre-trained Word Embedding model from genism-data like this:
 """
 
 nlp_pre = gensim_api.load("word2vec-google-news-300")
@@ -518,7 +701,7 @@ print("dic[word]:", dic_vocabulary[word], "|idx")
 print("embeddings[idx]:", embeddings[dic_vocabulary[word]].shape, 
       "|vector")
 
-"""## Deep Learning:
+"""### Deep Learning:
 
 It’s finally time to build a deep learning model. I’m going to use the embedding matrix in the first Embedding layer of the neural network that I will build and train to classify the news. Each id in the input sequence will be used as the index to access the embedding matrix. The output of this Embedding layer will be a 2D matrix with a word vector for each word id in the input sequence (Sequence length x Vector size). Let’s use the sentence “I like this article” as an example:
 
@@ -571,7 +754,7 @@ inverse_dic = {v:k for k,v in dic_y_mapping.items()}
 y_train = np.array([inverse_dic[y] for y in y_train])
 ## train
 training = model.fit(x=X_train, y=y_train, batch_size=256, 
-                     epochs=10, shuffle=True, verbose=0, 
+                     epochs=30, shuffle=True, verbose=0, 
                      validation_split=0.3)
 
 ## plot loss and accuracy
@@ -594,24 +777,28 @@ ax[1].set_ylabel('Loss', color='black')
 for metric in metrics:
      ax22.plot(training.history['val_'+metric], label=metric)
 ax22.set_ylabel("Score", color="steelblue")
-plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/loss_accuracy_LSTM.png')
+plt.savefig('/content/drive/MyDrive/NLP/Depression_Detection/modeling/loss_accuracy_LSTM_3.png')
 plt.show()
 
-## Save the Modle to file in the current working directory
-Bi_LSTM = "/content/drive/MyDrive/NLP/Depression_Detection/modeling/model_LSTM.pkl"  
+# serialize model to JSON
+model_json = model.to_json()
+with open("/content/drive/MyDrive/NLP/Depression_Detection/modeling/model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+model.save_weights("/content/drive/MyDrive/NLP/Depression_Detection/modeling/model.h5")
+print("Saved model to disk")
 
-with open(Bi_LSTM, 'wb') as file:  
-    pickle.dump(Bi_LSTM, file)
-
-## Load the Model back from file
-with open(Bi_LSTM, 'rb') as file:  
-    Bi_LSTM = pickle.load(file)
-
-Bi_LSTM
+loaded_model = model_from_json(open("/content/drive/MyDrive/NLP/Depression_Detection/modeling/model.json", "r").read(),
+                              custom_objects={'tf': tf})
+json_file.close() 
+# load weights into new model
+loaded_model.load_weights("/content/drive/MyDrive/NLP/Depression_Detection/modeling/model.h5")
+print("Loaded model from disk")
 
 labels_pred = model.predict(X_test)
 labels_pred = np.round(labels_pred.flatten())
 accuracy = accuracy_score(y_test, labels_pred)
+classes = np.unique(y_test)
 print("Accuracy: %.2f%%" % (accuracy*100))
 
 def conf_matrix_acc2(y_true, y_pred):
