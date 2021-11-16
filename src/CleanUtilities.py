@@ -45,6 +45,7 @@ import random ## generating random numbers
 # nltk.download('wordnet')
 # nltk.download('averaged_perceptron_tagger')
 
+
 #########################################################################
 
 ## Cleaning functions
@@ -180,12 +181,12 @@ def expandContractions(text, c_re=c_re):
 
 ## Function to perform stepwise cleaning process
 def tweets_cleaner(tweet):
-    cleaned_tweets = []
+    #cleaned_tweets = []
     tweet = tweet.lower()  # lowercase
 
     # if url links then don't append to avoid news articles
     # also check tweet length, save those > 5
-    if re.match("(\w+:\/\/\S+)", tweet) == None and len(tweet) > 5:
+    if re.match("(\w+:\/\/\S+)", tweet) == None:
         # remove hashtag, @mention, emoji and image URLs
         tweet = ' '.join(
             re.sub("(@[A-Za-z0-9]+)|(\#[A-Za-z0-9]+)|(<Emoji:.*>)|(pic\.twitter\.com\/.*)", " ", tweet).split())
@@ -208,9 +209,9 @@ def tweets_cleaner(tweet):
         # back to string from list
         tweet = ' '.join(filtered_sentence)  # join words with a space in between them
 
-        cleaned_tweets.append(tweet)
+        #cleaned_tweets.append(tweet)
 
-    return cleaned_tweets
+    return tweet
 
 #########################################################################
 
