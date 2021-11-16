@@ -66,11 +66,11 @@ import random ## generating random numbers
 
 depressive_tweets_df = pd.read_csv("/content/drive/MyDrive/NLP/Depression_Detection/Data_fetch_API/output/depressive_tweets.csv")
 random_tweets_df = pd.read_csv("/content/drive/MyDrive/NLP/Depression_Detection/Depression_tweets_Data/Data1/Sentiment Analysis Dataset 2.csv", 
-                               encoding = "ISO-8859-1", usecols = range(0,4), nrows = 25000)
+                               encoding = "ISO-8859-1", usecols = range(0,4), nrows = 40000)
 
-depressive_tweets_df.head()
+depressive_tweets_df
 
-random_tweets_df.head()
+random_tweets_df
 
 ## Slicing the random tweets to have sentiment == 1 
 new_rand_df = random_tweets_df[random_tweets_df.Sentiment == 1]
@@ -80,7 +80,7 @@ new_rand_df.shape
 
 new_rand_df.head()
 
-"""12175 random tweets with sentiment == 1
+"""20952 random tweets with sentiment == 1
 
 ## Data Cleaning-Processing:
 """
@@ -104,7 +104,7 @@ new_rand_df.drop(columns=['ï»¿ItemID', 'index','Sentiment', 'SentimentSource'
 for col in depressive_tweets_df:
     print("There are ", len(depressive_tweets_df[col].unique()), "unique values in ", col)
 
-"""By considering **tweet.id** as our primary key, we have **11481** unique tweets, so we need to get rid of the duplicates."""
+"""By considering **tweet.id** as our primary key, we have **18190** unique tweets, so we need to get rid of the duplicates."""
 
 ## Finding unique values in each column
 for col in new_rand_df:
@@ -122,7 +122,7 @@ depressive_tweets_df.shape
 ## Find the number of Null values in each columns
 depressive_tweets_df.isnull().sum().to_frame().rename(columns={0:'Null values'})
 
-"""There are **3957** Null values in the **location** columns but since location will not be used in our analysis or as a feature in our model, we don't need to replace them."""
+"""There are **6384** Null values in the **location** columns but since location will not be used in our analysis or as a feature in our model, we don't need to replace them."""
 
 ## Find the number of Null values in each columns
 new_rand_df.isnull().sum().to_frame().rename(columns={0:'Null values'})
@@ -486,6 +486,19 @@ corpus[:10]
 
 ## Adding clean tweets as a new column
 df_all['clean_text'] = corpus
+
+"""We have to remove those rows with tweets that has been completely deleted in the cleaning process."""
+
+# replace field that's entirely space (or empty) with NaN
+df_all.replace(r'^\s*$', np.nan, regex=True, inplace=True)
+
+df_all[df_all['clean_text'].isnull()]
+
+## Deleting the rows with nan 
+df_all.dropna(subset=['clean_text'], inplace=True)
+
+## Double_check for nan
+df_all[df_all['clean_text'].isnull()]
 
 ## Save cleaned_dataset
 df_all.to_csv('/content/drive/MyDrive/NLP/Depression_Detection/data_cleaning/processed_data/processed_data.csv',
