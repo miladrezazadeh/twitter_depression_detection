@@ -1,0 +1,5 @@
+wcwidth
+
+[docs]
+furo
+sphinx
