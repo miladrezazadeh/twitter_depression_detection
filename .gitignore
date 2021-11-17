@@ -1,3 +1,5 @@
 **/.DS_Store
 .*.swp
 .*.swo
+src/venv/lib/python3.9/site-packages/en_core_web_lg/en_core_web_lg-2.2.0/vocab/lexemes.bin
+src/venv/lib/python3.9/site-packages/en_core_web_lg/en_core_web_lg-2.2.0/vocab/vectors
