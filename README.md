@@ -30,7 +30,7 @@ We need two types of datasets one with tweets containing depressive characterist
 
 2. Random tweets has been extracted from the [Kaggle datasets](https://www.kaggle.com/ywang311/twitter-sentiment/data). 
 
-* The processed dataset used to train machine learning algorithms can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/processed).
+* The processed dataset used for training machine learning algorithms can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/processed).
 
 ## Practical Applications
 
