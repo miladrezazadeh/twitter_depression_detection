@@ -9,15 +9,17 @@
 
 ## Table of Contents
 * [Overview](#Overview)
-* [Technologies Used](#technologies-used)
-* [Features](#features)
-* [Screenshots](#screenshots)
-* [Setup](#setup)
-* [Usage](#usage)
-* [Project Status](#project-status)
-* [Room for Improvement](#room-for-improvement)
-* [Acknowledgements](#acknowledgements)
-* [Contact](#contact)
+* [Background and Motivation](#Background and Motivation)
+* [Goals](#Goals)
+* [Datasets](#Datasets)
+* [Machine Learning Pipeline](#Machine Learning Pipeline)
+* [Practical Applications](#Practical Applications)
+* [Milestones](#Milestones)
+* [Clean the dataset](#Clean the dataset)
+* [Train the best model](#Train the best model)
+* [Predict](#Predict)
+* [License](#License)
+* [References](#References)
 <!-- * [License](#license) -->
 
 ## Overview
@@ -50,7 +52,8 @@ We need two types of datasets one with tweets containing depressive characterist
 
 * The processed dataset used for training machine learning algorithms can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/processed).
 
-## Data Science Pipeline:
+## Machine Learning Pipeline:
+
 * Data Collection : Balanced dataset collected from Twitter API and Kaggle dataset.
 * Data Preprocess: Data Cleaning/exploring/processing/Anotation/Analysis via NLP libraries.
 * EDA and Feature Selection : CountVectorizer, TFIDF, spaCy word embedding model, spaCy word embedding model.
