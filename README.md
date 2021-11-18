@@ -71,11 +71,14 @@ python train.py <file_name> <model_name>
 ```bash
 python predict.py <tweet.txt> SVM
 ```
+
+
+## License
+
+The repo has a MIT License.
+
 ## References
 
 * https://www.apa.org/topics/depression
 * https://www.kaggle.com/ywang311/twitter-sentiment/data
 
-## License
-
-The repo has a MIT License.
