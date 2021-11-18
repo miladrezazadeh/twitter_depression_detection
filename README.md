@@ -24,7 +24,13 @@ The goal of this project is to implement supervised machine learning techniques 
 
 ## Datasets
 
-* Extract more than 20K tweets by using [Twitter API and Tweepy library](https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/notebooks/data_gathering_twitter_API.ipynb). The raw data is located in [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/raw/scrapped)  
+We need two types of datasets one with tweets containing depressive characteristic which is obtained from twitter API and the other one with random tweets.
+
+1. Extract more than 20K tweets by using [Twitter API and Tweepy library](https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/notebooks/data_gathering_twitter_API.ipynb). The raw data retrieved from Twitter can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/raw/scrapped).  
+
+2. Random tweets has been extracted from the [Kaggle datasets](https://www.kaggle.com/ywang311/twitter-sentiment/data). 
+
+* The processed dataset used to train machine learning algorithms can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/processed).
 
 ## Practical Applications
 
@@ -33,3 +39,4 @@ The goal of this project is to implement supervised machine learning techniques 
 ## References
 
 * https://www.apa.org/topics/depression
+* https://www.kaggle.com/ywang311/twitter-sentiment/data
