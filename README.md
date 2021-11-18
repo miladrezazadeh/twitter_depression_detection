@@ -7,6 +7,19 @@
 <img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true" align="middle"> 
 </div>
 
+## Table of Contents
+* [Overview](#Overview)
+* [Technologies Used](#technologies-used)
+* [Features](#features)
+* [Screenshots](#screenshots)
+* [Setup](#setup)
+* [Usage](#usage)
+* [Project Status](#project-status)
+* [Room for Improvement](#room-for-improvement)
+* [Acknowledgements](#acknowledgements)
+* [Contact](#contact)
+<!-- * [License](#license) -->
+
 ## Overview
 
 Social media platforms such as Twitter, Instagram and Facebook play dominant roles in our day to day life. The popularity of these platforms has been significantly increased during the pandemic. Studies show that people are more likely to share their feelings and emotions on Twitter since the beginning of the Covid-19 pandemic. Positive emotions are not commonly associated with higher life satisfaction; however, negative emotions are more likely to express a person true feelings. 
