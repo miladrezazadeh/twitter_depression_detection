@@ -12,7 +12,7 @@
 * [Background and Motivation](#Background-and-Motivation)
 * [Goals](#Goals)
 * [Datasets](#Datasets)
-* [Machine Learning Pipeline](#Machine-Learning-Pipeline)
+* [Data Sceince Pipeline](#Data-Science-Pipeline)
 * [Practical Applications](#Practical-Applications)
 * [Milestones](#Milestones)
 * [Clean the dataset](#Clean-the-dataset)
@@ -52,7 +52,7 @@ We need two types of datasets one with tweets containing depressive characterist
 
 * The processed dataset used for training machine learning algorithms can be find [here](https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/data/processed).
 
-## Machine Learning Pipeline:
+## Data Science Pipeline:
 
 * Data Collection : Balanced dataset collected from Twitter API and Kaggle dataset.
 * Data Preprocess: Data Cleaning/exploring/processing/Anotation/Analysis via NLP libraries.
