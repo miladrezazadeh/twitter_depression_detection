@@ -70,3 +70,7 @@ python predict.py <tweet.txt> SVM
 
 * https://www.apa.org/topics/depression
 * https://www.kaggle.com/ywang311/twitter-sentiment/data
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
