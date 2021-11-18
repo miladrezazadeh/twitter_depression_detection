@@ -1,6 +1,8 @@
 # Twitter Depression Detection
 
-<img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true" class="center"> 
+<center>
+<img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true" > 
+</center>
 
 ## Overview
 
