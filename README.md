@@ -1,5 +1,5 @@
 # Twitter Depression Detection
-(https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true))
+![alt text](https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true))
 ## Overview
 
 ## Background and Motivation
