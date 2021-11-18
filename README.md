@@ -1,3 +1,5 @@
+![](https://img.shields.io/github/license/miladrezazadeh/twitter_depression_detection?style=flat-square)
+
 # Twitter Depression Detection
 
 <div class="verticalcenter">
