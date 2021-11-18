@@ -47,17 +47,25 @@ We need two types of datasets one with tweets containing depressive characterist
 ## Milestones
 
 ## Libaries to install
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requred libraries.
+
+```bash
 pip install -r requirements.txt
+```
 
 ## Clean the dataset
+
+```bash
 python clean.py <file_name> 
-
+```
 ## Train the best model
+```bash
 python train.py <file_name> <model_name>
-
+```
 ## Predict 
+```bash
 python predict.py <tweet.txt> SVM
-
+```
 ## References
 
 * https://www.apa.org/topics/depression
