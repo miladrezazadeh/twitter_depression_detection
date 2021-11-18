@@ -1,4 +1,5 @@
 ![](https://img.shields.io/github/license/miladrezazadeh/twitter_depression_detection?style=flat-square)
+![](https://img.shields.io/github/repo-size/miladrezazadeh/twitter_depression_detection)
 
 # Twitter Depression Detection
 
