@@ -3,10 +3,6 @@
 
 # Twitter Depression Detection
 
-<div class="verticalcenter">
-<img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true" align="middle"> 
-</div>
-
 ## Table of Contents
 * [Overview](#Overview)
 * [Background and Motivation](#Background-and-Motivation)
@@ -26,6 +22,9 @@ Social media platforms such as Twitter, Instagram and Facebook play dominant rol
 
 Depression is the most common mental disorder which is more than just being sad. Some signs of depression are lack of interest in daily activities, significant weight loss or gain, insomnia or excessive sleeping, lack of energy, inability to concentrate, feelings of worthlessness or excessive guilt and in severe cases recurrent thoughts of death or suicide. Auspiciously, depression is treatable. The treatment is a combination of therapy and antidepressant medication.
 
+<div class="verticalcenter">
+<img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/depression.png?raw=true" align="middle"> 
+</div>
 
 ## Background and Motivation
 
