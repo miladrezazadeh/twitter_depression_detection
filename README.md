@@ -15,9 +15,7 @@
 * [Data Sceince Pipeline](#Data-Science-Pipeline)
 * [Practical Applications](#Practical-Applications)
 * [Milestones](#Milestones)
-* [Clean the dataset](#Clean-the-dataset)
-* [Train the best model](#Train-the-best-model)
-* [Predict](#Predict)
+* [Usage](#Usage)
 * [License](#License)
 * [References](#References)
 <!-- * [License](#license) -->
@@ -67,23 +65,32 @@ We need two types of datasets one with tweets containing depressive characterist
 
 ## Milestones
 
-## Libaries to install
+## Usage
+
+* Clone this repository
+
+```bash
+git clone https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/src
+```
+
+* Libaries to install
+
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requred libraries.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Clean the dataset
+* Clean the dataset
 
 ```bash
 python clean.py <file_name> 
 ```
-## Train the best model
+* Train the best model
 ```bash
 python train.py <file_name> <model_name>
 ```
-## Predict 
+* Predict 
 ```bash
 python predict.py <tweet.txt> SVM
 ```
@@ -91,7 +98,7 @@ python predict.py <tweet.txt> SVM
 
 ## License
 
-The repo has a MIT License.
+This repo has a MIT License.
 
 ## References
 
