@@ -103,4 +103,5 @@ This repo has a MIT License.
 
 * https://www.apa.org/topics/depression
 * https://www.kaggle.com/ywang311/twitter-sentiment/data
+* https://github.com/tatsath/fin-ml/tree/master/Chapter%2010%20-%20Natural%20Language%20Processing
 
