@@ -105,4 +105,5 @@ This repo has a MIT License.
 * https://www.kaggle.com/ywang311/twitter-sentiment/data
 * https://github.com/tatsath/fin-ml/tree/master/Chapter%2010%20-%20Natural%20Language%20Processing
 * https://towardsdatascience.com/text-classification-with-nlp-tf-idf-vs-word2vec-vs-bert-41ff868d1794
+* https://github.com/kiranrawat/Detecting-Fake-News-On-Social-Media
 
