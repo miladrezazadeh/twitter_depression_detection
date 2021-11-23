@@ -3,6 +3,10 @@
 
 # Twitter Depression Detection
 
+<div class="verticalcenter">
+<img src = "https://github.com/miladrezazadeh/twitter_depression_detection/blob/main/img/app.png?raw=true" align="middle"> 
+</div>
+
 ## Table of Contents
 * [Overview](#Overview)
 * [Background and Motivation](#Background-and-Motivation)
