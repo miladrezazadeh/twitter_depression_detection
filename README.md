@@ -69,7 +69,7 @@ We need two types of datasets one with tweets containing depressive characterist
 * Clone this repository
 
 ```bash
-git clone https://github.com/miladrezazadeh/twitter_depression_detection/tree/main/src
+git clone https://github.com/miladrezazadeh/twitter_depression_detection.git 
 ```
 
 * Libaries to install
