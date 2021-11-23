@@ -13,8 +13,6 @@
 * [Goals](#Goals)
 * [Datasets](#Datasets)
 * [Data Sceince Pipeline](#Data-Science-Pipeline)
-* [Practical Applications](#Practical-Applications)
-* [Milestones](#Milestones)
 * [Usage](#Usage)
 * [License](#License)
 * [References](#References)
@@ -63,10 +61,6 @@ We need two types of datasets one with tweets containing depressive characterist
 * Inference : F1-Score, Confusion matrix and ROC-AUC to make an inference
 * Model Deployment : Deployment on AWS or heroku
 * Data Product : Flask-based web application
-
-## Practical Applications
-
-## Milestones
 
 ## Usage
 
