@@ -4,7 +4,6 @@ charset-normalizer==2.0.7
 click==8.0.3
 cycler==0.11.0
 cymem==2.0.6
-en-core-web-lg==2.2.0
 fonttools==4.28.1
 ftfy==6.0.3
 idna==3.3
