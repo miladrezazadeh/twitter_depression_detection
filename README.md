@@ -72,6 +72,17 @@ We need two types of datasets one with tweets containing depressive characterist
 git clone https://github.com/miladrezazadeh/twitter_depression_detection.git 
 ```
 
+* Create a virtual environment
+
+```bash
+python3 -m venv env
+```
+
+* Activating a virtual environment
+
+```bash
+source env/bin/activate
+```
 * Libaries to install
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requred libraries.
