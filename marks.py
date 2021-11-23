@@ -27,7 +27,7 @@ def tweet_prediction(tweet):
                         for s in clean_tweet])
     ## Load the model
     SVM = \
-        "/Users/milad/OneDrive - Dalhousie University/Depression_Detection/twitter_depression_detection/models/model_svm1.pkl"
+        "/models/model_svm1.pkl"
     with open(SVM, 'rb') as file3:
         clf = pickle.load(file3)
 
