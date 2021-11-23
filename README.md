@@ -91,6 +91,11 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requred
 pip install -r requirements.txt
 ```
 
+Download [en_core_web_lg](https://spacy.io/models/en#en_core_web_lg) from Spacy
+
+```bash
+python -m spacy download en_core_web_lg
+```
 * Clean the dataset
 
 ```bash
