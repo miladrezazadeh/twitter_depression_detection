@@ -109,7 +109,10 @@ python train.py <file_name> <model_name>
 ```bash
 python predict.py <tweet.txt> SVM
 ```
+* Run the Flask Application
 
+- Start flask web server: `python app.py`
+- The server will start on the address http://127.0.0.1:5000 [if port 5000 is not occupied]
 
 ## License
 
